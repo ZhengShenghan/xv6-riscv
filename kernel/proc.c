@@ -681,3 +681,9 @@ procdump(void)
     printf("\n");
   }
 }
+
+// print hello
+void print_hello(int n)
+{
+  printf("Hello from %d\n",n);
+}

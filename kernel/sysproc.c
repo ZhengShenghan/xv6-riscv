@@ -89,3 +89,11 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+uint64 sys_hello(void) // hello def
+{
+  int n;
+  argint(0,&n);
+  print_hello(n);
+  return 0;
+}
