@@ -5,6 +5,7 @@
 #include "spinlock.h"
 #include "proc.h"
 #include "defs.h"
+#include "syscall.h"
 
 struct cpu cpus[NCPU];
 
@@ -686,4 +687,40 @@ procdump(void)
 void print_hello(int n)
 {
   printf("Hello from %d\n",n);
+}
+
+// sysinfo
+int systeminfo(int info)
+{
+  if (info == 0) // number of active process
+  {
+    uint64 count = 0;
+    struct proc *p;
+
+    for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if (p->state != UNUSED) {
+      count++;
+    }
+    release(&p->lock);
+    }
+
+    return count;
+  }
+  if (info == 1) // number of syscalls made so far
+  {
+    uint64 count = syscall_count;
+    return count;
+  }
+  if (info == 2) // number of free memory pages
+  {
+    uint sz;
+    struct proc* p = myproc();
+    sz = p->sz;
+    uint64 total_size = PGROUNDUP(sz);
+    uint64 free_page = (total_size - sz) / PGSIZE;
+    return free_page;
+    
+  }
+  return 0;
 }
