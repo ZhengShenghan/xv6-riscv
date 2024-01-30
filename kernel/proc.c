@@ -6,6 +6,8 @@
 #include "proc.h"
 #include "defs.h"
 #include "syscall.h"
+extern int syscall_count;  
+// extern struct fuckyou kmem;
 
 struct cpu cpus[NCPU];
 
@@ -709,18 +711,12 @@ int systeminfo(int info)
   }
   if (info == 1) // number of syscalls made so far
   {
-    uint64 count = syscall_count;
-    return count;
+    return syscall_count;
   }
   if (info == 2) // number of free memory pages
   {
-    uint sz;
-    struct proc* p = myproc();
-    sz = p->sz;
-    uint64 total_size = PGROUNDUP(sz);
-    uint64 free_page = (total_size - sz) / PGSIZE;
-    return free_page;
+    return countpage();
     
   }
-  return 0;
+  return -1;
 }

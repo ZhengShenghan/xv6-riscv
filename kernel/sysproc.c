@@ -99,3 +99,13 @@ uint64 sys_hello(void) // hello def
 }
 
 
+
+uint64 sys_sysinfo(void) // hello def
+{
+  int n;
+  argint(0,&n);
+  return systeminfo(n);
+}
+
+
+

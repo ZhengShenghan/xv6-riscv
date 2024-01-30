@@ -22,5 +22,3 @@
 #define SYS_close  21
 #define SYS_hello  22 // hello
 #define SYS_sysinfo 23 // sysinfo
-
-extern int syscall_count;
