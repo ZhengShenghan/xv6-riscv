@@ -109,3 +109,11 @@ uint64 sys_sysinfo(void) // hello def
 
 
 
+uint64 sys_procinfo(void) // hello def
+{
+ // struct pinfo* p;
+  uint64 p;
+  argaddr(1, &p);
+  return procinfo((struct pinfo *)p);
+}
+

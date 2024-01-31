@@ -190,3 +190,11 @@ void            virtio_disk_intr(void);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
+
+//pinfo for lab1
+struct pinfo {
+int ppid;
+int syscall_count;
+int page_usage;
+};
+int procinfo(struct pinfo *in);

@@ -22,3 +22,4 @@
 #define SYS_close  21
 #define SYS_hello  22 // hello
 #define SYS_sysinfo 23 // sysinfo
+#define SYS_procinfo 24 //procinfo

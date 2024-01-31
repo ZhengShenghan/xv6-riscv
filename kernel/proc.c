@@ -148,6 +148,7 @@ found:
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
+  p->syscall_count=0;
 
   return p;
 }
@@ -719,4 +720,9 @@ int systeminfo(int info)
     
   }
   return -1;
+}
+
+int procinfo(struct pinfo *in)
+{
+  return 0;
 }
