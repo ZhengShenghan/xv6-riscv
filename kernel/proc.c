@@ -6,6 +6,7 @@
 #include "proc.h"
 #include "defs.h"
 #include "syscall.h"
+#include "stddef.h"
 extern int syscall_count;  
 // extern struct fuckyou kmem;
 
@@ -724,5 +725,17 @@ int systeminfo(int info)
 
 int procinfo(struct pinfo *in)
 {
+  if (in == NULL)
+  {
+    return -1;
+  } 
+  struct pinfo buf;
+  struct proc *p = myproc();
+  in->ppid = p->parent->pid;
+  in->syscall_count = p->syscall_count;
+  if (copyout(p->pagetable, (uint64)in, (char *)&buf, sizeof(buf)) < 0)
+  {
+    return -1;
+  }
   return 0;
 }
