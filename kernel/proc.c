@@ -731,8 +731,9 @@ int procinfo(struct pinfo *in)
   } 
   struct pinfo buf;
   struct proc *p = myproc();
-  in->ppid = p->parent->pid;
-  in->syscall_count = p->syscall_count;
+  buf.ppid = p->parent->pid;
+  buf.syscall_count = p->syscall_count;
+  buf.page_usage = PGROUNDUP(p->sz) / PGSIZE;
   if (copyout(p->pagetable, (uint64)in, (char *)&buf, sizeof(buf)) < 0)
   {
     return -1;
