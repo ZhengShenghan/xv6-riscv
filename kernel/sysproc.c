@@ -117,3 +117,20 @@ uint64 sys_procinfo(void) // hello def
   return procinfo((struct pinfo *)p);
 }
 
+
+uint64 
+sys_sched_statistics(void)
+{
+    // Implementation of sched_statistics
+    return stats();
+}
+
+uint64
+sys_sched_tickets(void)
+{
+    int tickets;
+    argint(0, &tickets);
+    // Set the current process's tickets to the given value
+    return set_tickets(tickets);
+    return 0;
+}

@@ -109,6 +109,8 @@ int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
 void            procdump(void);
 void            print_hello(int); //hello
 int            systeminfo(int); // sysinfo
+int            stats(void); // sched_statistics note: the order must be stricted followed wtf
+int            set_tickets(int); // sched_tickets
 
 // swtch.S
 void            swtch(struct context*, struct context*);

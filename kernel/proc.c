@@ -740,3 +740,26 @@ int procinfo(struct pinfo *in)
   }
   return 0;
 }
+
+int stats(void){
+  struct proc *p;
+
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if(p->state == UNUSED)
+      continue;
+    printf("%d(%s): tickets: %d, ticks: %d\n", p->pid, p->name, p->tickets, p->ticks);
+    release(&p->lock);
+  }
+
+  return 0;
+}
+
+int set_tickets(int tickets){
+  if (tickets > 10000){
+    return -1;
+  }
+  myproc()->tickets = tickets;
+
+  return 0;
+}
