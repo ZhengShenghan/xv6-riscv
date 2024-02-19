@@ -150,6 +150,8 @@ found:
   p->context.ra = (uint64)forkret;
   p->context.sp = p->kstack + PGSIZE;
   p->syscall_count=0;
+  p->tickets = DEFAULT_TICKET_VALUE;
+  p->ticks = 0; // number of time scheduled to run
 
   return p;
 }
@@ -762,4 +764,10 @@ int set_tickets(int tickets){
   myproc()->tickets = tickets;
 
   return 0;
+}
+
+uint16 rand(void){
+  uint16 lfsr = 0xACE1u;
+  uint16 bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
+  return lfsr = (lfsr >> 1) | (bit << 15);
 }

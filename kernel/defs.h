@@ -111,7 +111,7 @@ void            print_hello(int); //hello
 int            systeminfo(int); // sysinfo
 int            stats(void); // sched_statistics note: the order must be stricted followed wtf
 int            set_tickets(int); // sched_tickets
-
+uint16         rand(void); //function for random generator
 // swtch.S
 void            swtch(struct context*, struct context*);
 
@@ -193,6 +193,7 @@ void            virtio_disk_intr(void);
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
 
+#define DEFAULT_TICKET_VALUE 10000
 //pinfo for lab1
 struct pinfo {
 int ppid;
