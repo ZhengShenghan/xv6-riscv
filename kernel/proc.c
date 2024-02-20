@@ -10,6 +10,8 @@
 extern int syscall_count;  
 // extern struct fuckyou kmem;
 
+unsigned long long tickets_count=0;
+
 struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
@@ -151,6 +153,7 @@ found:
   p->context.sp = p->kstack + PGSIZE;
   p->syscall_count=0;
   p->tickets = DEFAULT_TICKET_VALUE;
+  tickets_count+=p->tickets;
   p->ticks = 0; // number of time scheduled to run
 
   return p;
@@ -176,6 +179,7 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  tickets_count-=p->tickets;
 }
 
 // Create a user page table for a given process, with no user memory,
@@ -458,7 +462,14 @@ scheduler(void)
   for(;;){
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
-
+    #if defined(LOTTERY)
+    unsigned short randval= rand();
+    for(p = proc; p < &proc[NPROC]; p++) {
+      acquire(&p->lock);
+      p->tickets;
+      release(&p->lock);
+    }
+    #endif
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
@@ -761,6 +772,8 @@ int set_tickets(int tickets){
   if (tickets > 10000){
     return -1;
   }
+  tickets_count-=myproc()->tickets;
+  tickets_count+=tickets;
   myproc()->tickets = tickets;
 
   return 0;
