@@ -194,6 +194,8 @@ void            virtio_disk_intr(void);
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
 
 #define DEFAULT_TICKET_VALUE 10000
+#define UINT16MAX 65535
+#define LOTTERY
 //pinfo for lab1
 struct pinfo {
 int ppid;
