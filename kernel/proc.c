@@ -463,7 +463,7 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
     #if defined(LOTTERY)
-    unsigned long long lottery_num= tickets_count/UINT16MAX/rand();
+    unsigned long long lottery_num=rand()/UINT16MAX*tickets_count;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state != RUNNABLE) 
@@ -476,6 +476,7 @@ scheduler(void)
       //Yeah babe, that's the one
       p->state = RUNNING;
       c->proc = p;
+      p->ticks++;
       swtch(&c->context, &p->context);
       // Process is done running for now.
       // It should have changed its p->state before coming back.

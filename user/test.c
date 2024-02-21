@@ -9,5 +9,6 @@ int main(int argc, char *argv[])
     
     printf("say hello to %d\n", n);
     hello(n);
+    sched_statistics();
     exit(0);
 }
