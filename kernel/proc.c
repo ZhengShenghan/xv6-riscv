@@ -777,8 +777,9 @@ int stats(void){
   for (p = proc; p < &proc[NPROC]; p++) {
     acquire(&p->lock);
     if(p->state == UNUSED)
-      continue;
+      goto release_lock_stats;
     printf("%d(%s): tickets: %d, ticks: %d\n", p->pid, p->name, p->tickets, p->ticks);
+  release_lock_stats:
     release(&p->lock);
   }
 
