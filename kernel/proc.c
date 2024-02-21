@@ -7,8 +7,7 @@
 #include "defs.h"
 #include "syscall.h"
 #include "stddef.h"
-extern int syscall_count;  
-// extern struct fuckyou kmem;
+extern int syscall_count;
 
 //unsigned long long tickets_count=0;
 

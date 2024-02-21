@@ -98,16 +98,12 @@ uint64 sys_hello(void) // hello def
   return 0;
 }
 
-
-
 uint64 sys_sysinfo(void) // hello def
 {
   int n;
   argint(0,&n);
   return systeminfo(n);
 }
-
-
 
 uint64 sys_procinfo(void) // hello def
 {
@@ -117,20 +113,18 @@ uint64 sys_procinfo(void) // hello def
   return procinfo((struct pinfo *)p);
 }
 
-
 uint64 
 sys_sched_statistics(void)
 {
-    // Implementation of sched_statistics
-    return stats();
+  // Implementation of sched_statistics
+  return stats();
 }
 
 uint64
 sys_sched_tickets(void)
 {
-    int tickets;
-    argint(0, &tickets);
-    // Set the current process's tickets to the given value
-    return set_tickets(tickets);
-    return 0;
+  int tickets;
+  argint(0, &tickets);
+  // Set the current process's tickets to the given value
+  return set_tickets(tickets);
 }

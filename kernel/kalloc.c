@@ -83,12 +83,12 @@ kalloc(void)
 
 int countpage(void)
 {
-    uint64 count = 0;
-    struct run *r;
-    acquire(&kmem.lock);
-    for (r = kmem.freelist; r != 0; r = r->next) {
-      count++;
-    }
-    release(&kmem.lock);
-    return count;
+  uint64 count = 0;
+  struct run *r;
+  acquire(&kmem.lock);
+  for (r = kmem.freelist; r != 0; r = r->next) {
+    count++;
+  }
+  release(&kmem.lock);
+  return count;
 }

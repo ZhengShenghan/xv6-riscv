@@ -200,8 +200,8 @@ void            virtio_disk_intr(void);
 
 //pinfo for lab1
 struct pinfo {
-int ppid;
-int syscall_count;
-int page_usage;
+  int ppid;
+  int syscall_count;
+  int page_usage;
 };
 int procinfo(struct pinfo *in);
