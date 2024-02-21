@@ -463,7 +463,7 @@ scheduler(void)
     // Avoid deadlock by ensuring that devices can interrupt.
     intr_on();
     #if defined(LOTTERY)
-    unsigned long long lottery_num=rand()/UINT16MAX*tickets_count;
+    unsigned long long lottery_num = rand()/UINT16MAX*tickets_count;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state != RUNNABLE) 
@@ -796,9 +796,9 @@ int set_tickets(int tickets){
 
   return 0;
 }
-
+unsigned short lfsr = 0xACE1u;
+unsigned short bit;
 uint16 rand(void){
-  uint16 lfsr = 0xACE1u;
-  uint16 bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
+  bit = ((lfsr >> 0) ^ (lfsr >> 2) ^ (lfsr >> 3) ^ (lfsr >> 5)) & 1;
   return lfsr = (lfsr >> 1) | (bit << 15);
 }

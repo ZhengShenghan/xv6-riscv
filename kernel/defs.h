@@ -196,6 +196,7 @@ void            virtio_disk_intr(void);
 #define DEFAULT_TICKET_VALUE 10000
 #define UINT16MAX 65535
 #define LOTTERY
+
 //pinfo for lab1
 struct pinfo {
 int ppid;
