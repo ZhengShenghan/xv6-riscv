@@ -1,3 +1,4 @@
+#include <limits.h>
 #include "types.h"
 #include "param.h"
 #include "memlayout.h"
@@ -8,8 +9,6 @@
 #include "syscall.h"
 #include "stddef.h"
 extern int syscall_count;
-
-//unsigned long long tickets_count=0;
 
 struct cpu cpus[NCPU];
 
@@ -152,7 +151,7 @@ found:
   p->context.sp = p->kstack + PGSIZE;
   p->syscall_count=0;
   p->tickets = DEFAULT_TICKET_VALUE;
- // tickets_count+=p->tickets;
+  p->stride = 0;
   p->ticks = 0; // number of time scheduled to run
 
   return p;
@@ -178,7 +177,6 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
-  //tickets_count-=p->tickets;
 }
 
 // Create a user page table for a given process, with no user memory,
@@ -467,18 +465,21 @@ scheduler(void)
     for(p = proc; p < &proc[NPROC]; p++) {
        acquire(&p->lock);
        if(p->state == RUNNABLE){
-        tickets_count+=p->tickets;
+         tickets_count+=p->tickets;
        }
        release(&p->lock);
     }
-
-    unsigned long long lottery_num = tickets_count*(unsigned long long) rand()/UINT16MAX;
+    unsigned long long rand_num = rand();
+    rand_num = (rand_num << 16) ^ rand();
+    rand_num = (rand_num << 16) ^ rand();
+    rand_num = (rand_num << 16) ^ rand();
+    unsigned long long lottery_num = rand_num%tickets_count;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
-      if(p->state != RUNNABLE) 
+      if(p->state != RUNNABLE)
         goto release_continue;
       //Iterate and count
-      if (lottery_num>p->tickets){
+      if(lottery_num>p->tickets) {
         lottery_num-=p->tickets;
         goto release_continue;
       }
@@ -495,9 +496,31 @@ scheduler(void)
     release_continue:
       release(&p->lock);
     }
-
-    #endif
-    #if defined(DEFAULTSCHEDULER)
+    #elif defined(STRIDE)
+    struct proc *min_proc = 0;
+    unsigned long long min_stride = -1;
+    for(p = proc; p < &proc[NPROC]; p++) {
+       acquire(&p->lock);
+       if(p->state == RUNNABLE){
+         if(p->stride < min_stride || min_stride == -1){
+           min_stride = p->stride;
+           min_proc = p;
+         }
+       }
+       release(&p->lock);
+    }
+    if(!min_proc) continue;
+    // Schedule this process.
+    acquire(&min_proc->lock);
+    unsigned long long step = BIG_CONSTANT_K / min_proc->tickets;
+    min_proc->stride += step;
+    min_proc->state = RUNNING;
+    c->proc = p;
+    min_proc->ticks++;
+    swtch(&c->context, &min_proc->context);
+    c->proc = 0;
+    release(&min_proc->lock);
+    #else
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
@@ -506,6 +529,7 @@ scheduler(void)
         // before jumping back to us.
         p->state = RUNNING;
         c->proc = p;
+        p->ticks++;
         swtch(&c->context, &p->context);
 
         // Process is done running for now.
@@ -802,8 +826,6 @@ int set_tickets(int tickets){
   if (tickets > 10000){
     return -1;
   }
- // tickets_count-=myproc()->tickets;
-  //tickets_count+=tickets;
   myproc()->tickets = tickets;
 
   return 0;

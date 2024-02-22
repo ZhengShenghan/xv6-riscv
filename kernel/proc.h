@@ -105,6 +105,7 @@ struct proc {
   struct inode *cwd;           // Current directory
   int syscall_count;
   unsigned long long tickets;                 // value of tickets
-  unsigned long long ticks;                    // number of tickets
+  unsigned long long stride;                  // value of current stride
+  unsigned long long ticks;                   // number of tickets
   char name[16];               // Process name (debugging)
 };
