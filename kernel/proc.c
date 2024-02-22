@@ -500,14 +500,14 @@ scheduler(void)
     struct proc *min_proc = 0;
     unsigned long long min_stride = -1;
     for(p = proc; p < &proc[NPROC]; p++) {
-       acquire(&p->lock);
-       if(p->state == RUNNABLE){
-         if(p->stride < min_stride || min_stride == -1){
-           min_stride = p->stride;
-           min_proc = p;
-         }
-       }
-       release(&p->lock);
+      acquire(&p->lock);
+      if(p->state == RUNNABLE){
+        if(p->stride < min_stride || min_stride == -1){
+          min_stride = p->stride;
+          min_proc = p;
+        }
+      }
+      release(&p->lock);
     }
     if(!min_proc) continue;
     // Schedule this process.
@@ -515,7 +515,7 @@ scheduler(void)
     unsigned long long step = BIG_CONSTANT_K / min_proc->tickets;
     min_proc->stride += step;
     min_proc->state = RUNNING;
-    c->proc = p;
+    c->proc = min_proc;
     min_proc->ticks++;
     swtch(&c->context, &min_proc->context);
     c->proc = 0;
