@@ -126,5 +126,6 @@ sys_sched_tickets(void)
   int tickets;
   argint(0, &tickets);
   // Set the current process's tickets to the given value
-  return set_tickets(tickets);
+  set_tickets(tickets);
+  return 0;
 }

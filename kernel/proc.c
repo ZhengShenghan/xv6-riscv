@@ -815,20 +815,18 @@ int stats(void){
     if(p->state == UNUSED)
       goto release_lock_stats;
     printf("%d(%s): tickets: %d, ticks: %d\n", p->pid, p->name, p->tickets, p->ticks);
-  release_lock_stats:
+    release_lock_stats:
     release(&p->lock);
   }
 
   return 0;
 }
 
-int set_tickets(int tickets){
+void set_tickets(int tickets){
   if (tickets > 10000){
-    return -1;
+    return;
   }
   myproc()->tickets = tickets;
-
-  return 0;
 }
 unsigned short lfsr = 0xACE1u;
 unsigned short bit;
