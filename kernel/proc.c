@@ -473,7 +473,7 @@ scheduler(void)
     rand_num = (rand_num << 16) ^ rand();
     rand_num = (rand_num << 16) ^ rand();
     rand_num = (rand_num << 16) ^ rand();
-    unsigned long long lottery_num = rand_num%tickets_count;
+    unsigned long long lottery_num = rand_num%tickets_count + 1;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state != RUNNABLE)
