@@ -27,6 +27,7 @@ int sysinfo(int); // sysinfo
 int procinfo(struct pinfo*); // proinfo
 int sched_statistics(void); // sched_statistics
 int sched_tickets(int); // sched_statistics
+int clone(void*); // clone
 
 // ulib.c
 int stat(const char*, struct stat*);
