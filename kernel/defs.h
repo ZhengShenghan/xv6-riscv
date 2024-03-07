@@ -113,6 +113,7 @@ int            stats(void); // sched_statistics note: the order must be stricted
 void           set_tickets(int); // sched_tickets
 uint16         rand(void); //function for random generator
 uint16         stable_rand(void);
+int            clone(void*);
 // swtch.S
 void            swtch(struct context*, struct context*);
 

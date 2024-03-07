@@ -104,6 +104,7 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   int syscall_count;
+  int thread_id;               // thread id for tracking
   unsigned long long tickets;                 // value of tickets
   unsigned long long stride;                  // value of current stride
   unsigned long long ticks;                   // number of tickets

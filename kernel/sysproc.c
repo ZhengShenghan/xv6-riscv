@@ -129,3 +129,11 @@ sys_sched_tickets(void)
   set_tickets(tickets);
   return 0;
 }
+
+uint64
+sys_clone(void)
+{
+  uint64 stack_ptr;
+  argaddr(0, &stack_ptr);
+  return clone((void*)stack_ptr);
+}

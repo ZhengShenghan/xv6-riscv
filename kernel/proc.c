@@ -179,6 +179,22 @@ freeproc(struct proc *p)
   p->state = UNUSED;
 }
 
+// only free local field. Used for child process
+void
+freeproc_child(struct proc *p)
+{
+  if(p->trapframe)
+    kfree((void*)p->trapframe);
+  p->trapframe = 0;
+  p->pid = 0;
+  p->parent = 0;
+  p->name[0] = 0;
+  p->killed = 0;
+  p->xstate = 0;
+  p->state = UNUSED;
+}
+
+
 // Create a user page table for a given process, with no user memory,
 // but with trampoline and trapframe pages.
 pagetable_t
@@ -422,7 +438,13 @@ wait(uint64 addr)
             release(&wait_lock);
             return -1;
           }
-          freeproc(pp);
+          if (pp->thread_id == 0) {
+            // This is a parent process
+            freeproc(pp);
+          } else {
+            // This is a child thread. Free only thread-local resources.
+            freeproc_child(pp);
+          }
           release(&pp->lock);
           release(&wait_lock);
           return pid;
@@ -839,4 +861,106 @@ unsigned short stable_rand_res=0;
 uint16 stable_rand(void){
  stable_rand_res+=300;
  return stable_rand_res;
+}
+
+static struct proc*
+allocproc_thread(void)
+{
+  struct proc *p;
+
+  for(p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if(p->state == UNUSED) {
+      goto found;
+    } else {
+      release(&p->lock);
+    }
+  }
+  return 0;
+
+found:
+  p->pid = allocpid();
+  p->state = USED;
+
+  // Allocate a trapframe page.
+  if((p->trapframe = (struct trapframe *)kalloc()) == 0){
+    freeproc(p);
+    release(&p->lock);
+    return 0;
+  }
+
+  // Do not allocate a new page table for the thread.
+  // The thread will share the parent's page table. 
+  // The associated code is in clone(e.g np->pagetable = p->pagetable)
+
+  // Set up new context to start executing at forkret,
+  // which returns to user space.
+  memset(&p->context, 0, sizeof(p->context));
+  p->context.ra = (uint64)forkret;
+  p->context.sp = p->kstack + PGSIZE;
+  p->syscall_count=0;
+  p->tickets = DEFAULT_TICKET_VALUE;
+  p->stride = 0;
+  p->ticks = 0; // number of time scheduled to run
+
+  return p;
+}
+
+int next_thread_id(struct proc *p) {
+  static int next_tid = 1; // Static variable to keep track of the next thread ID
+  int tid;
+
+  acquire(&p->lock);
+  tid = next_tid++;
+  release(&p->lock);
+
+  return tid;
+}
+
+
+
+int clone(void* stack){
+  int pid;
+  struct proc *np;
+  struct proc *p = myproc();
+
+  // Stack sanity check
+  if (stack == 0 || ((uint64)stack % PGSIZE) != 0) {
+    return -1; // stack is null or not page-aligned
+  }
+
+  // Allocate process.
+  if((np = allocproc_thread()) == 0){
+    return -1;
+  }
+
+  // Share user memory (address space) with parent.
+  np->pagetable = p->pagetable;
+  np->sz = p->sz;
+
+  // Copy saved user registers.
+  *(np->trapframe) = *(p->trapframe);
+
+  // Set up child kernel stack to use the provided stack.
+  np->trapframe->sp = (uint64)stack;
+
+  // Cause clone to return 0 in the child.
+  np->trapframe->a0 = 0;
+
+  // Set thread ID for the child thread.
+  np->thread_id = next_thread_id(p);
+
+  pid = np->pid;
+
+  release(&np->lock);
+
+  acquire(&wait_lock);
+  np->parent = p;
+  release(&wait_lock);
+
+  acquire(&np->lock);
+  np->state = RUNNABLE;
+  release(&np->lock);
+
+  return pid;
 }
