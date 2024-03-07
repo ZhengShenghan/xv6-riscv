@@ -952,6 +952,14 @@ int clone(void* stack){
 
   pid = np->pid;
 
+  // mapp address
+  uint64 child_trapframe_addr = TRAPFRAME - PGSIZE * np->thread_id;
+  if (mappages(p->pagetable, child_trapframe_addr, PGSIZE, (uint64)np->trapframe, PTE_R | PTE_W) < 0) {// readable and writable
+    freeproc(np);
+    release(&np->lock);
+    return -1;
+  }
+
   release(&np->lock);
 
   acquire(&wait_lock);
