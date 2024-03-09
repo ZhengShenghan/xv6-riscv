@@ -7,18 +7,11 @@
 
 #define N  3
 
-void
-print(const char *s)
-{
-  write(1, s, strlen(s));
-}
-
-int
-main(void)
+int main(void)
 {
   int n = 0, pid;
 
-  print("clone test\n");
+  printf("clone test\n");
 
   for(n=0; n<N; n++){
     void *m = malloc(1<<20);
@@ -39,6 +32,6 @@ main(void)
     printf("bad wait: more children %d\n", pid);
   }
 
-  print("clone test OK\n");
+  printf("clone test OK\n");
   return 0;
 }

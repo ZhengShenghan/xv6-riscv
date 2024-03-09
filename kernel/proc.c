@@ -951,6 +951,10 @@ int clone(void* stack){
   // Cause clone to return 0 in the child.
   np->trapframe->a0 = 0;
 
+  // increment reference counts on open file descriptors.
+  for(int i = 0; i < NOFILE; i++)
+    if(p->ofile[i])
+      np->ofile[i] = filedup(p->ofile[i]);
   np->cwd = idup(p->cwd);
   safestrcpy(np->name, p->name, sizeof(p->name));
 
