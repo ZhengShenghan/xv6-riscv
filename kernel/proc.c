@@ -946,6 +946,9 @@ int clone(void* stack){
   // Cause clone to return 0 in the child.
   np->trapframe->a0 = 0;
 
+  np->cwd = idup(p->cwd);
+  safestrcpy(np->name, p->name, sizeof(p->name));
+
   // Set thread ID for the child thread.
   np->thread_id = next_thread_id(p);
 

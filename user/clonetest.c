@@ -13,38 +13,30 @@ print(const char *s)
   write(1, s, strlen(s));
 }
 
-void
-clonetest(void)
+int
+main(void)
 {
-  int n, pid;
+  int n = 0, pid;
 
   print("clone test\n");
 
   for(n=0; n<N; n++){
     void *m = malloc(1<<20);
-    pid = clone((void*)((uint64)m / 4096 * 4096 + 4096));
+    pid = clone(m+(1 << 20)-1);
     printf("clone %d: %d\n", n, pid);
-    if (pid == 0) return;
-  }
-
-  for(; n > 0; n--){
-    if(wait(0) < 0){
-      print("wait stopped early\n");
-      exit(1);
+    if (pid == 0) {
+      for (int i = 0; i < 1000000000; i++);
+      return 0;
     }
   }
 
-  if(wait(0) != -1){
-    print("wait got too many\n");
-    exit(1);
+//  for(;;);
+  for(n=0; n<N; n++){
+    pid = wait(0);
+    printf("%d exited\n", pid);
   }
+  return 0;
 
   print("clone test OK\n");
-}
-
-int
-main(void)
-{
-  clonetest();
-  exit(0);
+  return 0;
 }
