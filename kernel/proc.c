@@ -907,11 +907,10 @@ found:
 }
 
 int next_thread_id(struct proc *p) {
-  static int next_tid = 1; // Static variable to keep track of the next thread ID
   int tid;
 
   acquire(&p->lock);
-  tid = next_tid++;
+  tid = ++p->thread_count;
   release(&p->lock);
 
   return tid;
@@ -925,7 +924,7 @@ int clone(void* stack){
   struct proc *p = myproc();
 
   // Stack sanity check
-  if (stack == 0 || ((uint64)stack % PGSIZE) != 0) {
+  if (stack == 0) {
     return -1; // stack is null or not page-aligned
   }
 
