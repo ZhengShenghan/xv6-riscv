@@ -185,10 +185,15 @@ freeproc_child(struct proc *p)
 {
   if(p->trapframe)
     kfree((void*)p->trapframe);
+  if(p->pagetable)
+    uvmunmap(p->pagetable, TRAPFRAME - PGSIZE * p->thread_id, 1, 0);
   p->trapframe = 0;
+  p->pagetable = 0;
+  p->sz = 0;
   p->pid = 0;
   p->parent = 0;
   p->name[0] = 0;
+  p->chan = 0;
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;

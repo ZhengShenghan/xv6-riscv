@@ -35,7 +35,9 @@ main(void)
     pid = wait(0);
     printf("%d exited\n", pid);
   }
-  return 0;
+  if ((pid = wait(0)) != -1) {
+    printf("bad wait: more children %d\n", pid);
+  }
 
   print("clone test OK\n");
   return 0;
