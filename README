@@ -1,49 +1,54 @@
-xv6 is a re-implementation of Dennis Ritchie's and Ken Thompson's Unix
-Version 6 (v6).  xv6 loosely follows the structure and style of v6,
-but is implemented for a modern RISC-V multiprocessor using ANSI C.
+Extended xv6 Operating System
+This project extends the xv6 operating system with additional system calls and scheduling functionalities. The focus is on providing more insights into system and process information, as well as implementing different scheduling algorithms.
 
-ACKNOWLEDGMENTS
+New System Calls
+1. sysinfo(int param)
+Provides information about the system based on the input parameter:
 
-xv6 is inspired by John Lions's Commentary on UNIX 6th Edition (Peer
-to Peer Communications; ISBN: 1-57398-013-7; 1st edition (June 14,
-2000)).  See also https://pdos.csail.mit.edu/6.1810/, which provides
-pointers to on-line resources for v6.
+param == 0: Returns the total number of active processes in the system.
+param == 1: Returns the total number of system calls made since system boot-up.
+param == 2: Returns the number of free memory pages in the system.
+Otherwise: Returns an error (-1).
+2. procinfo(struct pinfo *in)
+Provides information specific to the current process:
 
-The following people have made contributions: Russ Cox (context switching,
-locking), Cliff Frey (MP), Xiao Yu (MP), Nickolai Zeldovich, and Austin
-Clements.
+'''
+struct pinfo {
+  int ppid;           // PID of the parent process
+  int syscall_count;  // Total number of system calls made by the current process
+  int page_usage;     // Current process's memory size in pages
+};
+Returns 0 on success and -1 otherwise.
+'''
 
-We are also grateful for the bug reports and patches contributed by
-Takahiro Aoyagi, Silas Boyd-Wickizer, Anton Burtsev, carlclone, Ian
-Chen, Dan Cross, Cody Cutler, Mike CAT, Tej Chajed, Asami Doi,
-eyalz800, Nelson Elhage, Saar Ettinger, Alice Ferrazzi, Nathaniel
-Filardo, flespark, Peter Froehlich, Yakir Goaron, Shivam Handa, Matt
-Harvey, Bryan Henry, jaichenhengjie, Jim Huang, Matúš Jókay, John
-Jolly, Alexander Kapshuk, Anders Kaseorg, kehao95, Wolfgang Keller,
-Jungwoo Kim, Jonathan Kimmitt, Eddie Kohler, Vadim Kolontsov, Austin
-Liew, l0stman, Pavan Maddamsetti, Imbar Marinescu, Yandong Mao, Matan
-Shabtay, Hitoshi Mitake, Carmi Merimovich, Mark Morrissey, mtasm, Joel
-Nider, Hayato Ohhashi, OptimisticSide, Harry Porter, Greg Price, Jude
-Rich, segfault, Ayan Shafqat, Eldar Sehayek, Yongming Shen, Fumiya
-Shigemitsu, Cam Tenny, tyfkda, Warren Toomey, Stephen Tu, Rafael Ubal,
-Amane Uehara, Pablo Ventura, Xi Wang, WaheedHafez, Keiichi Watanabe,
-Nicolas Wolovick, wxdao, Grant Wu, Jindong Zhang, Icenowy Zheng,
-ZhUyU1997, and Zou Chang Wei.
+3. sched_statistics(void)
+Prints statistics for each process, including PID, name, ticket value, and the number of times it has been scheduled to run.
 
+4. sched_tickets(int)
+Sets the caller process's ticket value to the given parameter. The maximum number of tickets for each process cannot exceed 10000.
 
-The code in the files that constitute xv6 is
-Copyright 2006-2022 Frans Kaashoek, Robert Morris, and Russ Cox.
+5. clone(void *stack)
+Creates a kernel-level thread using the parent's address space. The stack argument specifies the starting address of the user-level stack to be used by the child thread.
 
-ERROR REPORTS
+Scheduling Algorithms
+Lottery Scheduler: Implements a basic lottery scheduling algorithm without ticket transfers or compensation tickets.
+Stride Scheduler: Implements a basic stride scheduling algorithm using a large constant K (10000) to compute the stride value.
+Testing
+To test the new system calls and scheduling functionalities, you can use the following steps:
 
-Please send errors and suggestions to Frans Kaashoek and Robert Morris
-(kaashoek,rtm@mit.edu).  The main purpose of xv6 is as a teaching
-operating system for MIT's 6.1810, so we are more interested in
-simplifications and clarifications than new features.
+sysinfo and procinfo:
 
-BUILDING AND RUNNING XV6
+Call sysinfo() with different parameters to retrieve system information.
+Use procinfo() to get information about the current process.
+sched_statistics and sched_tickets:
 
-You will need a RISC-V "newlib" tool chain from
-https://github.com/riscv/riscv-gnu-toolchain, and qemu compiled for
-riscv64-softmmu.  Once they are installed, and in your shell
-search path, you can run "make qemu".
+Use sched_tickets() to set the ticket value for a process.
+Call sched_statistics() to print the scheduling statistics for each process.
+Lottery and Stride Schedulers:
+
+Configure the system to use either the lottery or stride scheduler.
+Observe the scheduling behavior and statistics using sched_statistics().
+clone:
+
+Create a kernel-level thread using clone() with a specified stack.
+Test the functionality of the thread and its interaction with the parent process.
