@@ -34,21 +34,63 @@ Scheduling Algorithms
 Lottery Scheduler: Implements a basic lottery scheduling algorithm without ticket transfers or compensation tickets.
 Stride Scheduler: Implements a basic stride scheduling algorithm using a large constant K (10000) to compute the stride value.
 Testing
-To test the new system calls and scheduling functionalities, you can use the following steps:
 
-sysinfo and procinfo:
 
-Call sysinfo() with different parameters to retrieve system information.
-Use procinfo() to get information about the current process.
-sched_statistics and sched_tickets:
+We have provided the user programs to test all the functionalities we implemented in our xv6. They are user/test1.c, user/test2.c, and user/test3.c.To test the new system calls and scheduling functionalities, you can use the following steps:
 
-Use sched_tickets() to set the ticket value for a process.
-Call sched_statistics() to print the scheduling statistics for each process.
-Lottery and Stride Schedulers:
+under xv6-riscv
 
-Configure the system to use either the lottery or stride scheduler.
-Observe the scheduling behavior and statistics using sched_statistics().
-clone:
 
-Create a kernel-level thread using clone() with a specified stack.
-Test the functionality of the thread and its interaction with the parent process.
+(1)test1
+
+make qemu
+
+test1 <#bytes of memeroy per process> <#child process> 
+
+sample output
+
+'''
+$ test1 65536 2
+[sysinfo] active proc: 3, syscalls: 47, free pages: 32563
+[procinfo 4] ppid: 3, syscalls: 10, page usage: 21
+[procinfo 5] ppid: 3, syscalls: 10, page usage: 21
+[sysinfo] active proc: 5, syscalls: 239, free pages: 32509
+'''
+(2)test2
+
+make LAB2=LOTTERY(or make LAB2=STRIDE)
+
+test2 <test time in ticks> <#process(k)> <#tick for process 1> <> .. <#tick for process k>
+
+sample output
+
+'''
+$ test2 100 3 30 20 10
+1(init): tickets: 100, ticks: 24
+2(sh): tickets: 100, ticks: 13
+3(test2): tickets: 100, ticks: 107
+4(test2): tickets: 30, ticks: 101
+5(test2): tickets: 20, ticks: 100
+6(test2): tickets: 10, ticks: 101
+'''
+(3)test3
+
+make qemu
+
+test3 <#round> <#thread>
+
+sample output
+
+'''
+$ test3 6 4
+Round 1: thread 0 is passing the token to thread 1
+Round 2: thread 1 is passing the token to thread 2
+Round 3: thread 2 is passing the token to thread 3
+Round 4: thread 3 is passing the token to thread 0
+Round 5: thread 0 is passing the token to thread 1
+Round 6: thread 1 is passing the token to thread 2
+Frisbee simulation has finished, 6 rounds played in total
+'''
+
+
+Note: TO exit qemu, use ctrl a + c and type quit
